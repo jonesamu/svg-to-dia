@@ -55,6 +55,7 @@ def build_shape(svg_path, width, height):
         (height // 2, 0),
         (height, 0),
         (width // 2, height),
+        (width // 2, height // 2),
         (width, height // 2),
         (width, height),
     ]
@@ -83,7 +84,7 @@ def main():
     sheet = Sheet(
         name=args.name,
         author=getpass.getuser(),
-        description=f"TODO: fill {args.name} description",
+        description=f"{args.name} description",
         objects={}
     )
 
@@ -100,7 +101,7 @@ def main():
             'convert',
             str(svg_file),
             '-resize',
-            '64x64',
+            '22x22',
             png_file,
         ])
         print(f"wrote {png_file}")
@@ -123,7 +124,7 @@ def main():
         shape_path.write_text(tshape)
         print(f"wrote {shape_path}")
 
-        sheet.objects[svg_file.stem] = f"TODO: fill description for {svg_file.stem}"
+        sheet.objects[svg_file.stem] = f"description {svg_file.stem}"
 
     xsheet = build_sheet(sheet)
     # ET.indent(xsheet)
