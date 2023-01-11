@@ -83,8 +83,8 @@ def main():
     # Check and define verbosity print output function
     if args.verbosity:
         def _verbose_print(*verbose_args):
-            if verbose_args[0] > (3 - args.verbosity):
-                print verbose_args[1]
+            if verbose_args[0] > (1 - args.verbosity):
+                print(verbose_args[1])
     else:
         _verbose_print = lambda *a: None # do-nothing function
 
