@@ -8,6 +8,8 @@ from pathlib import Path
 import getpass
 import subprocess
 
+# Control the verbosity of the output
+verbose_print = None
 
 @dataclass
 class Sheet:
@@ -74,8 +76,22 @@ def main():
     aparser = ArgumentParser()
     aparser.add_argument('--name', default='TODO')
     aparser.add_argument('svg_file', nargs='+')
+    aparser.add_argument('-v', '--verbosity', action="count",
+                         help="increase output verbosity (e.g., -vv is more than -v)")
     args = aparser.parse_args()
 
+    # Check and define verbosity print output function
+    if args.verbosity:
+        def _verbose_print(*verbose_args):
+            if verbose_args[0] > (3 - args.verbosity):
+                print verbose_args[1]
+    else:
+        _verbose_print = lambda *a: None # do-nothing function
+
+    global verbose_print
+    verbose_print = _verbose_print
+
+    # Set paths for sheets and shapes using name to hold all the shapes
     psheets = Path('sheets')
     psheets.mkdir(exist_ok=True)
     pshapes = Path('shapes')
@@ -92,7 +108,7 @@ def main():
     for svg_file in args.svg_file:
         svg_file = Path(svg_file)
         if svg_file.stem in seen:
-            print(f"ignoring duplicate {svg_file.stem}")
+            verbose_print(2, f"WARN: ignoring duplicate {svg_file.stem}")
             continue
         seen.add(svg_file.stem)
 
@@ -104,7 +120,7 @@ def main():
             '22x22',
             png_file,
         ])
-        print(f"wrote {png_file}")
+        verbose_print(1, f"INFO: wrote {png_file}")
 
         width, height = map(int, subprocess.check_output([
             'identify',
@@ -115,14 +131,14 @@ def main():
 
         new_path = pshapes.joinpath(f"{svg_file.stem}.svg")
         new_path.write_bytes(svg_file.read_bytes())
-        print(f"wrote {new_path}")
+        verbose_print(1, f"INFO: wrote {new_path}")
 
         xshape = build_shape(svg_file, width, height)
         # ET.indent(xshape)
         tshape = ET.tostring(xshape, encoding='unicode')
         shape_path = pshapes.joinpath(f"{svg_file.stem}.shape")
         shape_path.write_text(tshape)
-        print(f"wrote {shape_path}")
+        verbose_print(1, f"INFO: wrote {shape_path}")
 
         sheet.objects[svg_file.stem] = f"description {svg_file.stem}"
 
@@ -131,7 +147,7 @@ def main():
     tsheet = ET.tostring(xsheet, encoding="unicode")
     sheet_path = psheets.joinpath(f"{args.name}.sheet")
     sheet_path.write_text(tsheet)
-    print(f"wrote {sheet_path}")
+    verbose_print(1, f"INFO: wrote {sheet_path}")
 
 
 if __name__ == '__main__':
