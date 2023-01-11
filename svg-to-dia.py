@@ -94,8 +94,8 @@ def main():
     # Set paths for sheets and shapes using name to hold all the shapes
     psheets = Path('sheets')
     psheets.mkdir(exist_ok=True)
-    pshapes = Path('shapes')
-    pshapes.mkdir(exist_ok=True)
+    pshapes = Path(f'shapes/{args.name}')
+    pshapes.mkdir(parents=True, exist_ok=True)
 
     sheet = Sheet(
         name=args.name,
