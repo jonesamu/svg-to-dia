@@ -81,6 +81,7 @@ def main():
     args = aparser.parse_args()
 
     # Check and define verbosity print output function
+    # source: stackoverflow.com/questions/5980042/how-to-implement-the-verbose-or-v-option-into-a-script
     if args.verbosity:
         def _verbose_print(*verbose_args):
             if verbose_args[0] > (1 - args.verbosity):
